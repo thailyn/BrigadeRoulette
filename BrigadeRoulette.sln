@@ -5,6 +5,8 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BrigadeRouletteConsole", "BrigadeRouletteConsole\BrigadeRouletteConsole.csproj", "{7074FB7B-B1AA-46B2-B766-7B493D81759B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phlebotomist.Model", "Model\Phlebotomist.Model.csproj", "{7B60AB7B-C5CA-4564-A828-34B4907AB4ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{7074FB7B-B1AA-46B2-B766-7B493D81759B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7074FB7B-B1AA-46B2-B766-7B493D81759B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7074FB7B-B1AA-46B2-B766-7B493D81759B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B60AB7B-C5CA-4564-A828-34B4907AB4ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B60AB7B-C5CA-4564-A828-34B4907AB4ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B60AB7B-C5CA-4564-A828-34B4907AB4ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B60AB7B-C5CA-4564-A828-34B4907AB4ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
