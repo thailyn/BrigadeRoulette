@@ -1,0 +1,3 @@
+[submodule "Model"]
+	path = Model
+	url = git@github.com:thailyn/Phlebotomist-Model-.NET.git
