@@ -29,22 +29,45 @@ namespace BrigadeRouletteConsole
             }
         }
 
+        static void PrintBrigadeFormations(PhlebotomistRepository phlebotomistRepository,
+            IQueryable<BrigadeFormation> formations)
+        {
+            var rows = phlebotomistRepository.Context.BrigadeFormationVerticalPositionTypes.OrderByDescending(x => x.DamageDealtModifier);
+            foreach (var brigadeFormation in formations)
+            {
+                System.Console.WriteLine("Brigade Formation: {0}", brigadeFormation.Name);
+                foreach (var row in rows)
+                {
+                    // using the assumption that HorizontalPositionTypeId increases from left to right
+                    foreach (var horizontalPosition in brigadeFormation.Positions.OrderBy(x => x.HorizontalPositionTypeId))
+                    {
+                        if (horizontalPosition.VerticalPositionTypes.Id == row.Id)
+                        {
+                            System.Console.Write("*");
+                        }
+                        else
+                        {
+                            System.Console.Write(" ");
+                        }
+                        //System.Console.WriteLine("Horizontal: '{0}'/{1}, Vertical: '{2}'", horizontalPosition.HorizontalPositionTypes.Name,
+                        //    horizontalPosition.HorizontalPositionTypeId, horizontalPosition.VerticalPositionTypes.Name);
+                    }
+                    System.Console.WriteLine();
+                }
+            }
+        }
+
         static void Main(string[] args)
         {
             ReadInputFile(_inputFileName);
 
-            System.Console.WriteLine("Test.");
-            System.Console.ReadLine();
-
             PhlebotomistModelContainer brigadeContext = new PhlebotomistModelContainer();
             PhlebotomistRepository phlebotomistRepository = new Phlebotomist.Repositories.PhlebotomistRepository(brigadeContext);
 
-            var brigadeFormations = phlebotomistRepository.Context.BrigadeFormations.Where(x => x.NumPositions == 5);
-            System.Console.WriteLine("Found {0} brigade formation.", brigadeFormations.Count());
-            foreach (var brigadeFormation in brigadeFormations)
-            {
-                System.Console.WriteLine("Brigade Formation: {0}", brigadeFormation.Name);
-            }
+            var fiveFamiliarBrigadeFormations = phlebotomistRepository.Context.BrigadeFormations.Where(x => x.NumPositions == 5);
+            System.Console.WriteLine("Found {0} brigade formation with five familiars.", fiveFamiliarBrigadeFormations.Count());
+            PrintBrigadeFormations(phlebotomistRepository, fiveFamiliarBrigadeFormations);
+
 
             System.Console.WriteLine("Found {0} familiar types.", phlebotomistRepository.Context.FamiliarTypes.Count());
             foreach (var familiarType in phlebotomistRepository.Context.FamiliarTypes)
