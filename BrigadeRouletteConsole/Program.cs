@@ -9,15 +9,29 @@ using System.Threading.Tasks;
 
 namespace BrigadeRouletteConsole
 {
+    public class FamiliarWinPercent
+    {
+        public string FamiliarName { get; set; }
+        public Dictionary<BrigadeFormationVerticalPositionType, int> WinPercents { get; set; }
+
+        public FamiliarWinPercent()
+        {
+            WinPercents = new Dictionary<BrigadeFormationVerticalPositionType, int>();
+        }
+    }
+
     class Program
     {
         private static string _inputFileName = "input.csv";
 
-        static void ReadInputFile(string fileName)
+        static List<FamiliarWinPercent> ReadInputFile(PhlebotomistRepository phlebotomistRepository,
+            string fileName)
         {
+            int maxFamiliars = 10;
+            var winPercents = new List<FamiliarWinPercent>();
             using (var streamReader = new StreamReader(_inputFileName))
             {
-                while (!streamReader.EndOfStream)
+                while (!streamReader.EndOfStream && winPercents.Count < maxFamiliars)
                 {
                     var columns = streamReader.ReadLine().Split(',');
                     foreach (var column in columns)
@@ -25,8 +39,24 @@ namespace BrigadeRouletteConsole
                         System.Console.Write("'{0}'\t", column);
                     }
                     System.Console.WriteLine();
+
+                    var familiarWinPercent = new FamiliarWinPercent
+                    {
+                        FamiliarName = columns[0]
+                    };
+
+                    int nextInputFileColumn = 1;
+                    foreach(var verticalPosition in phlebotomistRepository.Context.BrigadeFormationVerticalPositionTypes.OrderByDescending(x => x.DamageDealtModifier))
+                    {
+                        familiarWinPercent.WinPercents[verticalPosition] = int.Parse(columns[nextInputFileColumn]);
+                        nextInputFileColumn++;
+                    }
+
+                    winPercents.Add(familiarWinPercent);
                 }
             }
+
+            return winPercents;
         }
 
         static void PrintBrigadeFormations(PhlebotomistRepository phlebotomistRepository,
