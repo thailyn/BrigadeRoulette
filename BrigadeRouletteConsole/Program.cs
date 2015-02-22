@@ -71,9 +71,10 @@ namespace BrigadeRouletteConsole
                 }
             }
 
-            formationWinPercent = totalWinPercent / (IncludeReserve ? Formation.NumPositions * 2 : Formation.NumPositions);
-            //return formationWinPercent;
-            return totalWinPercent;
+            formationWinPercent = totalWinPercent /
+                (IncludeReserve ? Formation.NumPositions * 2 : Formation.NumPositions);
+            return formationWinPercent;
+            //return totalWinPercent;
         }
 
         protected void UpdateMaxFamiliarsInPositions()
