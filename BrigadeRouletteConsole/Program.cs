@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace BrigadeRouletteConsole
 {
+    // TODO: Use Phlebotomist.ViewModels.BrigadeVerticalPosition (and equivalent enum for
+    // horizontal positions) instead of BrigadeFormationVerticalPositionType everywhere?
+
     // Is this class really needed?  Or could we extend BrigadeViewModel?
     public class BrigadeFormationWithFamiliars
     {
@@ -75,7 +78,20 @@ namespace BrigadeRouletteConsole
             {
                 while (!streamReader.EndOfStream && winPercents.Count < maxFamiliars)
                 {
-                    var columns = streamReader.ReadLine().Split(',');
+                    var line = streamReader.ReadLine();
+                    var columns = line.Split(',');
+                    int result;
+                    if (winPercents.Count == 0 && columns.All(x => !int.TryParse(x, out result)))
+                    {
+                        System.Console.WriteLine("Assuming initial line contains headers: '{0}'", line);
+                        continue;
+                    }
+                    if (columns.Length != 4)
+                    {
+                        throw new InvalidOperationException(
+                            string.Format("Row does not contain exactly four columns of data: '{0}'", line));
+                    }
+
                     foreach (var column in columns)
                     {
                         System.Console.Write("'{0}'\t", column);
