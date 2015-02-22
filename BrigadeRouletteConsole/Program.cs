@@ -398,6 +398,11 @@ namespace BrigadeRouletteConsole
         static IEnumerable<BrigadeFormationWithFamiliars> GetBrigadeFormationPermutations(PhlebotomistRepository phlebotomistRepository,
             List<FamiliarWinPercent> familiarWinPercents, BrigadeFormation formation, bool includeReserve)
         {
+            if (formation == null)
+            {
+                throw new ArgumentNullException("formation", "The BrigadeFormation argument can not be null!");
+            }
+
             var currentBrigadeInstace = new BrigadeFormationWithFamiliars(phlebotomistRepository, includeReserve);
             currentBrigadeInstace.Formation = formation;
             foreach (var brigadeFormation in GetBrigadeFormationPermutations(phlebotomistRepository, familiarWinPercents,
