@@ -434,9 +434,20 @@ namespace BrigadeRouletteConsole
 
             int num = 0;
             int numToPrint = 5;
-            var brigadeFormationPermuations = GetBrigadeFormationPermutations(phlebotomistRepository, familiarWinPercents,
-                fiveFamiliarBrigadeFormations.FirstOrDefault(), _includeReserve);
-            foreach (var permutation in brigadeFormationPermuations.OrderByDescending(x => x.WinPercent))
+            //var brigadeFormationPermutations = GetBrigadeFormationPermutations(phlebotomistRepository, familiarWinPercents,
+            //    //fiveFamiliarBrigadeFormations.FirstOrDefault(), _includeReserve);
+            //    fiveFamiliarBrigadeFormations.Where(x => string.Equals(x.Name, "5-Shield")).FirstOrDefault(), _includeReserve);
+
+            var brigadeFormationPermutations = new List<BrigadeFormationWithFamiliars>();
+            foreach (var brigadeFormation in fiveFamiliarBrigadeFormations)
+            {
+                brigadeFormationPermutations.AddRange(GetBrigadeFormationPermutations(phlebotomistRepository, familiarWinPercents,
+                    brigadeFormation, _includeReserve));
+                System.Console.WriteLine("Finished permuting formation '{0}'.  Current number of permutations: {1}.",
+                    brigadeFormation.Name, brigadeFormationPermutations.Count);
+            }
+
+            foreach (var permutation in brigadeFormationPermutations.OrderByDescending(x => x.WinPercent))
             {
                 System.Console.WriteLine("{0}: {1}%", num, permutation.WinPercent);
                 System.Console.WriteLine(permutation.ToString());
