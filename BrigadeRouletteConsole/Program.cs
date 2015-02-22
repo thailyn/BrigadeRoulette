@@ -92,11 +92,11 @@ namespace BrigadeRouletteConsole
             }
         }
 
-        static double CalculateBrigadeFormationWinPercent(List<FamiliarWinPercent> familiarWinPercents, BrigadeFormation formation)
+        static double CalculateBrigadeFormationWinPercent(List<FamiliarWinPercent> familiarWinPercents, BrigadeFormation formation,
+            bool includeReserve = true)
         {
             double formationWinPercent = 0;
             double totalWinPercent = 0;
-            bool includeReserve = true;
 
             int numFormationPositions = formation.Positions.Count;
             int currentFamiliarIndex = 0;
