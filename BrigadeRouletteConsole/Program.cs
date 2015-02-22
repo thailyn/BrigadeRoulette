@@ -105,6 +105,23 @@ namespace BrigadeRouletteConsole
             //return FamiliarsInPositions[position].Count < MaxFamiliarsInPositions[position] / (IncludeReserve ? 1 : 2);
         }
 
+        public bool HasOpenSlotsInPosition(BrigadeFormationVerticalPositionType position, bool forReserve)
+        {
+            if (forReserve && !IncludeReserve)
+            {
+                return false;
+            }
+
+            int numInPosition = FamiliarsInPositions.ContainsKey(position) ? FamiliarsInPositions[position].Count : 0;
+            int maxInPosition = 0;
+            if (MaxFamiliarsInPositions.ContainsKey(position))
+            {
+                maxInPosition = MaxFamiliarsInPositions[position] / ((IncludeReserve && !forReserve) ? 2 : 1);
+            }
+
+            return numInPosition < maxInPosition;
+        }
+
         public BrigadeFormationWithFamiliars(PhlebotomistRepository phlebotomistRepository,
             bool includeReserve = true)
         {
