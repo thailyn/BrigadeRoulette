@@ -192,6 +192,7 @@ namespace BrigadeRouletteConsole
     class Program
     {
         private static string _inputFileName = "input.csv";
+        private static bool _includeReserve = true;
 
         static List<FamiliarWinPercent> ReadInputFile(PhlebotomistRepository phlebotomistRepository,
             string fileName)
@@ -319,47 +320,85 @@ namespace BrigadeRouletteConsole
             {
                 yield return currentFormation;
             }
-
-            for (int i = 0; i < familiarWinPercents.Count; i++)
+            // First place all familiars in the non-reserve positions (that is, make sure at least currentFormation.Formation.NumPositions
+            // familiars have been placed).
+            else if (currentFormation.NumFamiliarsInPosition < currentFormation.Formation.NumPositions)
             {
-                bool placingReserveFamiliar = currentFormation.NumFamiliarsInPosition >= currentFormation.Formation.NumPositions &&
-                    currentFormation.IncludeReserve;
-
-                // The following can not be translated into a LINQ to Entities expression, so we have to do it the hard way. :(
-                //var positionsWithOpenSlots = phlebotomistRepository.Context.BrigadeFormationVerticalPositionTypes.Where(x =>
-                //    currentFormation.HasOpenSlotsInPosition(x));  // same as the following line
-                //    //currentFormation.FamiliarsInPositions[x].Count < currentFormation.MaxFamiliarsInPositions[x] / (placingReserveFamiliar ? 1 : 2));
-
-                var positionsWithOpenSlots = new List<BrigadeFormationVerticalPositionType>();
-                foreach (var verticalPosition in phlebotomistRepository.Context.BrigadeFormationVerticalPositionTypes)
-                {
-                    if (currentFormation.HasOpenSlotsInPosition(verticalPosition))
+                //for (int i = 0; i < currentFormation.Formation.NumPositions - currentFormation.NumFamiliarsInPosition; i++)
+                //{
+                    bool forReserve = false;
+                    var positionsWithOpenSlots = new List<BrigadeFormationVerticalPositionType>();
+                    foreach (var verticalPosition in phlebotomistRepository.Context.BrigadeFormationVerticalPositionTypes)
                     {
-                        positionsWithOpenSlots.Add(verticalPosition);
+                        if (currentFormation.HasOpenSlotsInPosition(verticalPosition, forReserve))
+                        {
+                            positionsWithOpenSlots.Add(verticalPosition);
+                        }
                     }
-                }
 
-                var nextFamiliar = familiarWinPercents[i];
-                foreach (var verticalPosition in positionsWithOpenSlots)
-                {
-                    BrigadeFormationWithFamiliars nextFormation = new BrigadeFormationWithFamiliars(currentFormation);
-                    var remainingFamiliars = new List<FamiliarWinPercent>(familiarWinPercents);
-                    remainingFamiliars.RemoveAt(i);
-
-                    nextFormation.FamiliarsInPositions[verticalPosition].Add(nextFamiliar);
-                    foreach (var permutation in GetBrigadeFormationPermutations(phlebotomistRepository, remainingFamiliars,
-                        nextFormation, includeReserve))
+                    var nextFamiliar = familiarWinPercents[0 /*i*/];
+                    foreach (var verticalPosition in positionsWithOpenSlots)
                     {
-                        yield return permutation;
+                        BrigadeFormationWithFamiliars nextFormation = new BrigadeFormationWithFamiliars(currentFormation);
+                        var remainingFamiliars = new List<FamiliarWinPercent>(familiarWinPercents);
+                        remainingFamiliars.RemoveAt(0 /*i*/);
+
+                        nextFormation.FamiliarsInPositions[verticalPosition].Add(nextFamiliar);
+                        foreach (var permutation in GetBrigadeFormationPermutations(phlebotomistRepository, remainingFamiliars,
+                            nextFormation, includeReserve))
+                        {
+                            yield return permutation;
+                        }
                     }
-                }
+                //}
+            }
+            else if (includeReserve)
+            {
+                if (currentFormation.NumFamiliarsInPosition < 5)
+                    throw new Exception("AAaahhhhh!!");
+
+                //for (int i = 0; i < familiarWinPercents.Count; i++)
+                //{
+                    //bool placingReserveFamiliar = currentFormation.NumFamiliarsInPosition >= currentFormation.Formation.NumPositions &&
+                    //    currentFormation.IncludeReserve;
+                    bool placingReserveFamiliar = true;
+
+                    // The following can not be translated into a LINQ to Entities expression, so we have to do it the hard way. :(
+                    //var positionsWithOpenSlots = phlebotomistRepository.Context.BrigadeFormationVerticalPositionTypes.Where(x =>
+                    //    currentFormation.HasOpenSlotsInPosition(x));  // same as the following line
+                    //    //currentFormation.FamiliarsInPositions[x].Count < currentFormation.MaxFamiliarsInPositions[x] / (placingReserveFamiliar ? 1 : 2));
+
+                    var positionsWithOpenSlots = new List<BrigadeFormationVerticalPositionType>();
+                    foreach (var verticalPosition in phlebotomistRepository.Context.BrigadeFormationVerticalPositionTypes)
+                    {
+                        if (currentFormation.HasOpenSlotsInPosition(verticalPosition, placingReserveFamiliar))
+                        {
+                            positionsWithOpenSlots.Add(verticalPosition);
+                        }
+                    }
+
+                    var nextFamiliar = familiarWinPercents[0 /*i*/];
+                    foreach (var verticalPosition in positionsWithOpenSlots)
+                    {
+                        BrigadeFormationWithFamiliars nextFormation = new BrigadeFormationWithFamiliars(currentFormation);
+                        var remainingFamiliars = new List<FamiliarWinPercent>(familiarWinPercents);
+                        remainingFamiliars.RemoveAt(0 /*i*/);
+
+                        nextFormation.FamiliarsInPositions[verticalPosition].Add(nextFamiliar);
+                        foreach (var permutation in GetBrigadeFormationPermutations(phlebotomistRepository, remainingFamiliars,
+                            nextFormation, includeReserve))
+                        {
+                            yield return permutation;
+                        }
+                    }
+                //}
             }
         }
 
         static IEnumerable<BrigadeFormationWithFamiliars> GetBrigadeFormationPermutations(PhlebotomistRepository phlebotomistRepository,
             List<FamiliarWinPercent> familiarWinPercents, BrigadeFormation formation, bool includeReserve)
         {
-            var currentBrigadeInstace = new BrigadeFormationWithFamiliars(phlebotomistRepository);
+            var currentBrigadeInstace = new BrigadeFormationWithFamiliars(phlebotomistRepository, includeReserve);
             currentBrigadeInstace.Formation = formation;
             foreach (var brigadeFormation in GetBrigadeFormationPermutations(phlebotomistRepository, familiarWinPercents,
                 currentBrigadeInstace, includeReserve))
@@ -389,14 +428,27 @@ namespace BrigadeRouletteConsole
              * */
 
             int num = 0;
+            int numToPrint = 5;
             var brigadeFormationPermuations = GetBrigadeFormationPermutations(phlebotomistRepository, familiarWinPercents,
-                fiveFamiliarBrigadeFormations.FirstOrDefault(), true);
+                fiveFamiliarBrigadeFormations.FirstOrDefault(), _includeReserve);
+            foreach (var permutation in brigadeFormationPermuations.OrderByDescending(x => x.WinPercent))
+            {
+                System.Console.WriteLine("{0}: {1}%", num, permutation.WinPercent);
+                System.Console.WriteLine(permutation.ToString());
+
+                num++;
+                if (num >= numToPrint)
+                    break;
+            }
+
+            /*
             foreach (var permutation in brigadeFormationPermuations)
             {
                 num++;
                 System.Console.Write("{0}: ", num);
                 System.Console.WriteLine(permutation.ToString());
             }
+             * */
 
             System.Console.WriteLine("Found {0} familiar types.", phlebotomistRepository.Context.FamiliarTypes.Count());
             foreach (var familiarType in phlebotomistRepository.Context.FamiliarTypes)
