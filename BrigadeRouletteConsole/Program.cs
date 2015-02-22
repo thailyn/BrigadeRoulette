@@ -9,6 +9,48 @@ using System.Threading.Tasks;
 
 namespace BrigadeRouletteConsole
 {
+    // Is this class really needed?  Or could we extend BrigadeViewModel?
+    public class BrigadeFormationWithFamiliars
+    {
+        protected PhlebotomistRepository PhlebotomistRepository { get; set; }
+
+        public BrigadeFormation Formation { get; set; }
+        public bool IncludeReserve { get; set; }
+
+        Dictionary<BrigadeFormationVerticalPositionType, List<FamiliarWinPercent>> FamiliarsInPositions { get; set; }
+        Dictionary<BrigadeFormationVerticalPositionType, int> MaxFamiliarsInPositions { get; set; }
+
+        protected void UpdateMaxFamiliarsInPositions()
+        {
+            if (Formation == null)
+            {
+                return;
+            }
+
+            MaxFamiliarsInPositions = new Dictionary<BrigadeFormationVerticalPositionType, int>();
+            foreach (var position in Formation.Positions)
+            {
+                if (!MaxFamiliarsInPositions.ContainsKey(position.VerticalPositionTypes))
+                {
+                    MaxFamiliarsInPositions[position.VerticalPositionTypes] = 0;
+                }
+
+                MaxFamiliarsInPositions[position.VerticalPositionTypes] += (IncludeReserve ? 2 : 1);
+            }
+        }
+
+        public BrigadeFormationWithFamiliars(PhlebotomistRepository phlebotomistRepository,
+            bool includeReserve = true)
+        {
+            PhlebotomistRepository = phlebotomistRepository;
+
+            IncludeReserve = includeReserve;
+            FamiliarsInPositions = new Dictionary<BrigadeFormationVerticalPositionType, List<FamiliarWinPercent>>();
+            MaxFamiliarsInPositions = new Dictionary<BrigadeFormationVerticalPositionType, int>();
+        }
+    }
+
+    // Is this class needed?  Or could we extend FamiliarViewModel?
     public class FamiliarWinPercent
     {
         public string FamiliarName { get; set; }
