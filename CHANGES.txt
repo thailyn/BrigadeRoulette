@@ -1,0 +1,8 @@
+Revision history for Brigade Roulette.
+
+0.1.0  Sun Feb 22 16:07:29 2015 -0500
+  New features:
+    - Initial release.  Get list of familiars with win percentages from an
+      input CSV file, and iterate over all known five-familiar brigade
+      formations to find the best formations and placements.  Print out the
+      top five matches.
