@@ -60,7 +60,21 @@ namespace BrigadeRouletteConsole
 
         protected double CalculateWinPercent()
         {
-            throw new NotImplementedException();
+            double formationWinPercent = 0;
+            double totalWinPercent = 0;
+
+            foreach (var position in FamiliarsInPositions.Keys)
+            {
+                foreach (var familiar in FamiliarsInPositions[position])
+                {
+                    totalWinPercent += familiar.WinPercents[position];
+                }
+            }
+
+            //formationWinPercent = totalWinPercent / (IncludeReserve ? Formation.NumPositions * 2 : Formation.NumPositions);
+            //return formationWinPercent;
+
+            return totalWinPercent;
         }
 
         protected void UpdateMaxFamiliarsInPositions()
